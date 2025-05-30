@@ -13,24 +13,27 @@ builder.Services.AddDbContext<BaseDeDatosContexto>(opciones =>
     opciones.UseSqlServer(builder.Configuration.GetConnectionString("ConexionBd"))
 );
 
-// Habilitar CORS para permitir peticiones desde el cliente Blazor
+// Habilitar CORS con múltiples orígenes permitidos
 builder.Services.AddCors(opciones =>
 {
     opciones.AddPolicy("PermitirClienteBlazor", politica =>
     {
-        politica.WithOrigins("http://localhost:5116")
-                .AllowAnyHeader()
-                .AllowAnyMethod();
+        politica.WithOrigins(
+            "http://localhost:5116", // Desarrollo local
+            "https://cliente.runasp.net" // Producción (ajustar si el dominio cambia)
+        )
+        .AllowAnyHeader()
+        .AllowAnyMethod();
     });
 });
 
 var app = builder.Build();
 
-// Habilitar Swagger para todos los entornos
+// Habilitar Swagger para todos los entornos (o solo en desarrollo si se desea)
 app.UseSwagger();
 app.UseSwaggerUI();
 
-// Activar CORS antes de redireccionar
+// Activar CORS antes del HTTPS
 app.UseCors("PermitirClienteBlazor");
 
 app.UseHttpsRedirection();
