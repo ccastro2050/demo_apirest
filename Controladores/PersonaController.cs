@@ -14,6 +14,11 @@ namespace demo_apirest.Controladores
         {
             _contexto = contexto;
         }
+        [HttpGet("/")]
+        public IActionResult Raiz()
+        {
+            return Ok("La API está funcionando correctamente.");
+        }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Persona>>> ObtenerPersonas()

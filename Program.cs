@@ -3,26 +3,38 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Agregar servicios de Swagger y controladores
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddControllers(); // Agregar esta línea
+builder.Services.AddControllers();
 
+// Registrar el contexto de base de datos
 builder.Services.AddDbContext<BaseDeDatosContexto>(opciones =>
     opciones.UseSqlServer(builder.Configuration.GetConnectionString("ConexionBd"))
 );
 
+// Habilitar CORS para permitir peticiones desde el cliente Blazor
+builder.Services.AddCors(opciones =>
+{
+    opciones.AddPolicy("PermitirClienteBlazor", politica =>
+    {
+        politica.WithOrigins("http://localhost:5116")
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+    });
+});
+
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+// Habilitar Swagger para todos los entornos
+app.UseSwagger();
+app.UseSwaggerUI();
+
+// Activar CORS antes de redireccionar
+app.UseCors("PermitirClienteBlazor");
 
 app.UseHttpsRedirection();
 
-app.MapControllers(); // Esta línea reemplaza el MapGet anterior
+app.MapControllers();
 
 app.Run();
-// Este es el punto de entrada principal para la aplicación ASP.NET Core.
-// Configura los servicios necesarios, incluyendo Swagger para la documentación de la API y el contexto de la base de datos.
